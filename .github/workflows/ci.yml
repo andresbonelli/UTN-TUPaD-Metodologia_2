@@ -1,0 +1,32 @@
+name: Continuous Integration & Quality Audit (DoD)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  quality-check:
+    name: Quality Audit & Pre-Commit Hook Execution
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Make pre-commit hook executable
+        run: chmod +x ./pre-commit
+
+      - name: Execute Pre-Commit Quality Hook
+        run: ./pre-commit
+
+      - name: Run Maven Clean Test Suite
+        run: mvn clean test
